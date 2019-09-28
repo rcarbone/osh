@@ -165,18 +165,23 @@ do_oracle()
   fi
 
   if [ ! -d $oraver ]; then
-
-    echo "  Unpacking ..."
-    echo "    Basic $orabase ..."
-    unzip $SPOOLDIR/$orabase > /dev/null
-
-    echo "    SDK   $orasdk ..."
-    unzip $SPOOLDIR/$orasdk  > /dev/null
-    echo -n "  Linking libclntsh.so ... "
-
-    (cd $oraver && ln -s $oraso libclntsh.so)
-    echo "done!"
+     mkdir $oraver
   fi
+
+  cd $ORADIR
+
+  echo "  Unpacking ..."
+  echo "    Basic $orabase ..."
+  unzip $SPOOLDIR/$orabase > /dev/null
+
+  echo "    SDK   $orasdk ..."
+  unzip $SPOOLDIR/$orasdk  > /dev/null
+
+  echo -n "  Linking libclntsh.so ... "
+  (cd $oraver && ln -s $oraso libclntsh.so)
+  cp $SPOOLDIR/LICENSE $oraver/LICENSE
+
+  echo "done!"
 }
 
 
@@ -317,9 +322,6 @@ if [ ! -d $PUBDIR ]; then
   mkdir $PUBDIR
 fi
 
-# tcsh
-do_tcsh
-
 # Oracle Instant Client
 do_oracle
 
@@ -328,6 +330,9 @@ do_ocilib
 
 # rlibc
 do_rlibc
+
+# tcsh
+do_tcsh
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
