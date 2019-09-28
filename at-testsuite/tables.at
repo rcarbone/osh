@@ -1,0 +1,64 @@
+# Testsuite for builtin extension [tables]
+
+# tables - no arguments
+AT_SETUP([tables])
+AT_DATA([command],
+[[tables
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f command > /dev/null])
+AT_CLEANUP
+
+# tables -h
+AT_SETUP([tables -h])
+AT_DATA([option_1],
+[[tables -h
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_1 > /dev/null])
+AT_CLEANUP
+
+# tables --help
+AT_SETUP([tables --help])
+AT_DATA([option_2],
+[[tables --help
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_2 > /dev/null])
+AT_CLEANUP
+
+# tables -q
+AT_SETUP([tables -q])
+AT_DATA([option_3],
+[[tables -q
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_3 > /dev/null])
+AT_CLEANUP
+
+# tables --quiet
+AT_SETUP([tables --quiet])
+AT_DATA([option_4],
+[[tables --quiet
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_4 > /dev/null])
+AT_CLEANUP
+
+# tables -r
+AT_SETUP([tables -r])
+AT_DATA([option_5],
+[[tables -r
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_5 > /dev/null])
+AT_CLEANUP
+
+# tables --reload
+AT_SETUP([tables --reload])
+AT_DATA([option_6],
+[[tables --reload
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_6 > /dev/null])
+AT_CLEANUP

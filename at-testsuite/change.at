@@ -1,0 +1,46 @@
+# Testsuite for builtin extension [chc]
+
+# chc - no arguments
+AT_SETUP([chc])
+AT_DATA([command],
+[[chc
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f command > /dev/null])
+AT_CLEANUP
+
+# chc -h
+AT_SETUP([chc -h])
+AT_DATA([option_1],
+[[chc -h
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_1 > /dev/null])
+AT_CLEANUP
+
+# chc --help
+AT_SETUP([chc --help])
+AT_DATA([option_2],
+[[chc --help
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_2 > /dev/null])
+AT_CLEANUP
+
+# chc -q
+AT_SETUP([chc -q])
+AT_DATA([option_3],
+[[chc -q
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_3 > /dev/null])
+AT_CLEANUP
+
+# chc --quiet
+AT_SETUP([chc --quiet])
+AT_DATA([option_4],
+[[chc --quiet
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_4 > /dev/null])
+AT_CLEANUP

@@ -1,0 +1,24 @@
+2019-07-29  Rocco Carbone <rocco@tecsiel.it>
+	* Initial public release 0.1.0 committed to GitHub
+
+	  Features:
+	  * Runs under Debian GNU/Linux bullseye (both x86_64 and x86) and RedHat/CentOS 7.6
+	  * Uses latest tcsh available at https://github.com/tcsh-org/tcsh
+	  * Uses Oracle Instant Client 12_2.0.1 downloaded from https://github.com/bumpx/oracle-instantclient/raw/master
+	  * Uses latest ocilib available at https://github.com/vrogier/ocilib
+
+	  * Supports only the following OCI C Data Type mapping:
+	     OCI_CDT_NUMERIC
+	     OCI_CDT_DATETIME
+	     OCI_CDT_TEXT
+	
+	  * Implements the following commands as extensions to native tcsh builtins:
+             help       about      version    license    when       connect    disconnect lsc        chc        select     
+             tables     describe   oping
+
+	  * [describe] command has table name completion and globbing via the $osh_tables variable
+	    e.g. you can issue commands in 'osh' such as:
+               osh@OSH> describe DE[TAB]
+	       osh@OSH> describe E*
+
+	  * General and minimal documentation have been written with an initial home page at http://tecsiel.it/osh

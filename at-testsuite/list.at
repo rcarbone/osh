@@ -1,0 +1,136 @@
+# Testsuite for builtin extension [lsc]
+
+# lsc - no arguments
+AT_SETUP([lsc])
+AT_DATA([command],
+[[lsc
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f command > /dev/null])
+AT_CLEANUP
+
+# lsc -h
+AT_SETUP([lsc -h])
+AT_DATA([option_1],
+[[lsc -h
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_1 > /dev/null])
+AT_CLEANUP
+
+# lsc --help
+AT_SETUP([lsc --help])
+AT_DATA([option_2],
+[[lsc --help
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_2 > /dev/null])
+AT_CLEANUP
+
+# lsc -q
+AT_SETUP([lsc -q])
+AT_DATA([option_3],
+[[lsc -q
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_3 > /dev/null])
+AT_CLEANUP
+
+# lsc --quiet
+AT_SETUP([lsc --quiet])
+AT_DATA([option_4],
+[[lsc --quiet
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_4 > /dev/null])
+AT_CLEANUP
+
+# lsc -u
+AT_SETUP([lsc -u])
+AT_DATA([option_5],
+[[lsc -u
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_5 > /dev/null])
+AT_CLEANUP
+
+# lsc --unsort
+AT_SETUP([lsc --unsort])
+AT_DATA([option_6],
+[[lsc --unsort
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_6 > /dev/null])
+AT_CLEANUP
+
+# lsc -r
+AT_SETUP([lsc -r])
+AT_DATA([option_7],
+[[lsc -r
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_7 > /dev/null])
+AT_CLEANUP
+
+# lsc --reverse
+AT_SETUP([lsc --reverse])
+AT_DATA([option_8],
+[[lsc --reverse
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_8 > /dev/null])
+AT_CLEANUP
+
+# lsc -N
+AT_SETUP([lsc -N])
+AT_DATA([option_9],
+[[lsc -N
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_9 > /dev/null])
+AT_CLEANUP
+
+# lsc --tnsname
+AT_SETUP([lsc --tnsname])
+AT_DATA([option_10],
+[[lsc --tnsname
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_10 > /dev/null])
+AT_CLEANUP
+
+# lsc -U
+AT_SETUP([lsc -U])
+AT_DATA([option_11],
+[[lsc -U
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_11 > /dev/null])
+AT_CLEANUP
+
+# lsc --user
+AT_SETUP([lsc --user])
+AT_DATA([option_12],
+[[lsc --user
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_12 > /dev/null])
+AT_CLEANUP
+
+# lsc -T
+AT_SETUP([lsc -T])
+AT_DATA([option_13],
+[[lsc -T
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_13 > /dev/null])
+AT_CLEANUP
+
+# lsc --uptime
+AT_SETUP([lsc --uptime])
+AT_DATA([option_14],
+[[lsc --uptime
+exit $status
+]])
+AT_CHECK([/usr/local/bin/osh -f option_14 > /dev/null])
+AT_CLEANUP

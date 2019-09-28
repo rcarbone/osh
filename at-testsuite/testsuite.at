@@ -1,0 +1,29 @@
+# Process this file with autom4te to create testsuite. -*- Autotest -*-
+
+AT_INIT
+
+AT_COPYRIGHT([Copyright (c) 2019 R. Carbone (rocco@tecsiel.it)
+
+SPDX-License-Identifier: BSD-2-Clause-FreeBSD])
+
+AT_TESTED([osh])
+
+m4_define([OSH_UNTESTED],
+[AT_SETUP([$1])
+AT_CHECK([exit 77])
+AT_CLEANUP
+])
+
+m4_include([help.at])
+m4_include([about.at])
+m4_include([version.at])
+m4_include([license.at])
+m4_include([when.at])
+m4_include([connect.at])
+m4_include([disconnect.at])
+m4_include([list.at])
+m4_include([change.at])
+m4_include([tables.at])
+m4_include([describe.at])
+m4_include([select.at])
+m4_include([ping.at])

@@ -1,0 +1,570 @@
+#!/bin/sh
+#
+# osh - A shell for Oracle
+#
+# R. Carbone (rocco@tecsiel.it)
+# 2Q 2019
+#
+# SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+#
+
+#
+# This script attempts to configure [osh] on your Linux system.
+#
+# Based on:
+#  tcsh    - C shell with file name completion and command line editing
+#  OCI     - Oracle Call Interface (Instant Client software)
+#  OCILIB  - C Driver for Oracle - by Vincent Rogier <vince.rogier@ocilib.net>
+#  rlibc   - C library of useful functions
+#
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#
+
+#
+# Addionatal Software requirements:
+#  git
+#  wget
+#  unzip
+#
+
+if ! [ -x "$(command -v git)" ]; then
+  echo 'Error: git is not installed.' >&2
+  exit 1
+fi
+if ! [ -x "$(command -v wget)" ]; then
+  echo 'Error: wget is not installed.' >&2
+  exit 1
+fi
+if ! [ -x "$(command -v unzip)" ]; then
+  echo 'Error: unzip is not installed.' >&2
+  exit 1
+fi
+
+# =-=-=-=-=-=-=-=-
+# The name of the game
+PACKAGE=osh
+
+# Main header file
+HEADER=osh.h
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-==-==-==-==-==-==-
+# All tcsh builtin extensions (please keep them alphabetically sorted)
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-==-==-==-==-==-==-
+EXTRACMDS="about"
+EXTRACMDS="$EXTRACMDS chc"
+EXTRACMDS="$EXTRACMDS connect"
+EXTRACMDS="$EXTRACMDS describe"
+EXTRACMDS="$EXTRACMDS disconnect"
+EXTRACMDS="$EXTRACMDS help"
+EXTRACMDS="$EXTRACMDS license"
+EXTRACMDS="$EXTRACMDS lsc"
+EXTRACMDS="$EXTRACMDS oping"
+EXTRACMDS="$EXTRACMDS select"
+EXTRACMDS="$EXTRACMDS tables"
+EXTRACMDS="$EXTRACMDS version"
+EXTRACMDS="$EXTRACMDS when"
+
+# =-=-=-=-=-=-=-=-
+# Project directories tree
+ROOTDIR=`pwd`
+
+# Level 1
+PUBDIR=$ROOTDIR/3rdparty
+EXTDIR=$ROOTDIR/src
+SHELLDIR=$ROOTDIR/shell
+SHELLNAME=`basename $ROOTDIR/shell`
+
+# Level 2
+SPOOLDIR=$PUBDIR/Archive
+# =-=-=-=-=-=-=-=-
+
+#
+# Required git modules
+#
+
+TCSHGIT=https://github.com/tcsh-org/tcsh
+OCIURL=https://github.com/bumpx/oracle-instantclient/raw/master
+OCILIBGIT=https://github.com/vrogier/ocilib
+RLIBCGIT=https://github.com/rcarbone/rlibc
+
+# tcsh - C shell with file name completion and command line editing by Christos Zoulas <christos@NetBSD.org>
+TCSHDIR=tcsh
+
+# Oracle - Client Shared Library 32/64-bit - 12.2.0.1.0
+ORADIR=$PUBDIR/oracle
+ORALIBDIR=$ORADIR/instantclient_12_2
+
+# Oracle Instant Client software
+oraver=$ORADIR/instantclient_12_2
+if [ `arch` = "x86_64" ]; then
+  orabase=instantclient-basic-linux.x64-12.2.0.1.0.zip
+  orasdk=instantclient-sdk-linux.x64-12.2.0.1.0.zip
+  oralite=instantclient-basiclite-linux.x64-12.2.0.1.0.zip
+else
+  orabase=instantclient-basic-linux-12.2.0.1.0.zip
+  orasdk=instantclient-sdk-linux-12.2.0.1.0.zip
+  oralite=instantclient-basiclite-linux-12.2.0.1.0.zip
+fi
+
+# variables
+oraso=libclntsh.so.12.1
+orahome=$oraver
+oraheaders=$orahome/sdk/include
+oralibs=$orahome
+
+# OCILIB - C Driver for Oracle - by Vincent Rogier <vince.rogier@ocilib.net>
+OCILIBDIR=ocilib
+OCILIB=$PUBDIR/$OCILIBDIR/src/.libs/libocilib.a
+
+# rlibc - C library of useful functions by Rocco Carbone <rocco@tecsiel.it>
+RLIBCDIR=$PUBDIR/rlibc/src
+RLIBC=$RLIBCDIR/librlibc.a
+
+# osh - C library implementing tcsh extensions
+PKGLIB=$EXTDIR/libosh.a
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# Functions
+
+# tcsh
+do_tcsh()
+{
+  cd $PUBDIR
+  echo "tcsh   - C shell with file name completion and command line editing"
+  if [ ! -d $TCSHDIR ]; then
+    echo -n "  Cloning tcsh ... "
+    git clone -q $TCSHGIT
+    echo "done!"
+  fi
+}
+
+
+# Oracle Instant Client
+do_oracle()
+{
+  cd $PUBDIR
+  echo "Oracle - Instant Client Shared libraries for Linux `arch`"
+
+  # Move to the Oracle root directory
+  if [ ! -d $ORADIR ]; then
+    mkdir $ORADIR
+  fi
+  cd $ORADIR
+
+  # Checking for Oracle instantclient zip files
+  if [ ! -d $SPOOLDIR ]; then
+    mkdir $SPOOLDIR
+    cd $SPOOLDIR
+    echo -n "  Downloading Oracle Instant Client. Please wait ... "
+    wget -q ${OCIURL}/LICENSE
+    wget -q ${OCIURL}/$orabase
+    wget -q ${OCIURL}/$orasdk
+#   wget -q ${OCIURL}/$oralite
+    echo "done!"
+  fi
+
+  if [ ! -d $oraver ]; then
+
+    echo "  Unpacking ..."
+    echo "    Basic $orabase ..."
+    unzip $SPOOLDIR/$orabase > /dev/null
+
+    echo "    SDK   $orasdk ..."
+    unzip $SPOOLDIR/$orasdk  > /dev/null
+    echo -n "  Linking libclntsh.so ... "
+
+    (cd $oraver && ln -s $oraso libclntsh.so)
+    echo "done!"
+  fi
+}
+
+
+# OCILIB
+do_ocilib()
+{
+  cd $PUBDIR
+  echo "OCILIB - C Driver for Oracle"
+  if [ ! -d $OCILIBDIR ]; then
+    echo -n "  Cloning ocilib ... "
+    git clone -q $OCILIBGIT
+    echo "done!"
+  fi
+  cd $OCILIBDIR
+  if [ ! -f config.status ]; then
+
+    # Fixing annoying aclocal and automake dependencies
+    if [ ! -x aclocal-1.15 ]; then
+       ln -s /usr/bin/aclocal aclocal-1.15
+    fi
+
+    if [ ! -x automake-1.15 ]; then
+       ln -s /usr/bin/automake automake-1.15
+    fi
+
+    echo -n "  Configuring ... "
+    ./configure --with-oracle-home=$orahome --with-oracle-headers-path=$oraheaders --with-oracle-lib-path=$orahome CFLAGS='-g -O2 -fPIC' 1> /dev/null 2>&1
+    echo "done!"
+    echo -n "  Compiling ..... "
+    make 1> /dev/null 2>&1
+    echo "done!"
+  fi
+}
+
+
+# rlibc
+do_rlibc()
+{
+  cd $PUBDIR
+  echo "rlibc  - C library of useful functions"
+  if [ ! -d $RLIBCDIR ]; then
+    echo -n "  Cloning rlibc ... "
+    git clone -q $RLIBCGIT
+    echo "done!"
+  fi
+  cd $RLIBCDIR
+  if [ ! -f $RLIBC ]; then
+    echo -n "  Compiling ... "
+    make 1> /dev/null 2>&1
+    echo "done!"
+  fi
+}
+
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+# Eval max length of commands
+maxn()
+{
+ longest=0
+ for cmd in $EXTRACMDS; do
+   n=${#cmd}
+   if [ $longest -lt $n ]; then
+    longest=$n
+  fi
+ done
+ echo $longest
+}
+
+
+#
+# Return the line in the tcsh file [sh.init.c] where a specific command
+# *must* be inserted to have the given extension $cmd full funtional.
+#
+# Warning: order in the array bfunc[] of [biltins] in file [sh.init.c]
+#          is relevant in order to have the extensions available.
+#
+linenumber()
+{
+  cmd=`echo $1`
+  file=`echo $2`
+  case $cmd in
+
+# Please keep them alphabetically sorted
+    about)      before=alias       ;;
+    chc)        before=chdir       ;;
+    connect)    after=complete     ;;
+    describe)   after=default      ;;
+    disconnect) before=echo        ;;
+    help)       before=history     ;;
+    license)    after=kill         ;;
+    lsc)        after=ls-F         ;;
+    oping)      after=onintr       ;;
+    select)     after=sched        ;;
+    tables)     after=switch       ;;
+    version)    before=wait        ;;
+    when)       before=where       ;;
+
+    *)          before=xxx after=xxx ;;
+  esac
+
+  row=0
+  if [ "$before" != "" -a "$before" != "xxx" ]; then
+    row=`grep -n \"$before\" $file | head -1 | cut -d":" -f 1`
+  elif [ "$after" != "" -a "$after" != "xxx" ]; then
+    row=`grep -n \"$after\" $file | head -1 | cut -d":" -f 1`
+    row=`expr $row + 1`
+  fi
+  echo $row
+}
+
+#
+# Main processing
+#
+
+# Development tree
+echo "$PACKAGE development tree"
+echo "  ."
+echo "  |-- at-testsuite"
+echo "  |-- docs"
+echo "  |-- etc"
+echo "  |-- `basename $PUBDIR`"
+echo "  |   |-- $OCILIBDIR"
+echo "  |   |-- `basename $ORADIR`"
+echo "  |   |   \`-- `basename $oraver`"
+echo "  |   |-- rlibc"
+echo "  |   \`-- tcsh"
+echo "  |-- `basename $SHELLDIR`"
+echo "  \`-- src"
+echo
+
+# git submodule init
+# git submodule update
+
+# Move to the root download directory
+if [ ! -d $PUBDIR ]; then
+  mkdir $PUBDIR
+fi
+
+# tcsh
+do_tcsh
+
+# Oracle Instant Client
+do_oracle
+
+# OCILIB
+do_ocilib
+
+# rlibc
+do_rlibc
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# -=-=-=-=-=-=-=-=-=-=
+# Start patching tcsh
+# -=-=-=-=-=-=-=-=-=-=
+
+# evaluate EXTRA items to be included in Makefile.in
+USRLIBS="$PKGLIB $RLIBC $OCILIB"
+EXTRAFLAGS="-I$PUBDIR/$OCILIBDIR/include -I$RLIBCDIR -I../src"
+EXTRALIBS="$USRLIBS -L$ORALIBDIR -lclntsh -lpthread -lm -lcrypt -lcurses"
+
+# extra source files
+EXTRASRCS="$HEADER $PACKAGE-tcsh-wrap.c"
+
+# extra object files
+EXTRAOBJS="$PACKAGE-tcsh-wrap.o"
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=
+
+# Move to project top directory
+cd $ROOTDIR
+
+# Create and populate the main [shell] directory
+if [ ! -d $SHELLNAME ]; then
+  echo
+  echo "Populating main directory [$SHELLNAME] ..."
+  cp -r $PUBDIR/tcsh $SHELLNAME
+  rm -rf $SHELLNAME/.git $SHELLNAME/.gitignore
+fi
+
+echo
+echo "Patching now tcsh sources ............"
+
+#
+# Patch file $HEADER
+#
+echo -n "  patching header file $HEADER ......... "
+cp $EXTDIR/$HEADER $SHELLDIR/$HEADER
+for cmd in `echo $EXTRACMDS | sort`; do
+  cat $SHELLDIR/$HEADER | echo "int $PACKAGE"_$cmd "(int argc, char * argv []);" >> $SHELLDIR/$HEADER
+done
+echo "done!"
+
+#
+# Patch src file tcsh-wrap.c
+#
+echo -n "  patching source file tcsh-wrap.c ... "
+cp $EXTDIR/tcsh-wrap.c $SHELLDIR/$PACKAGE-tcsh-wrap.c
+echo >> $SHELLDIR/$PACKAGE-tcsh-wrap.c
+
+for cmd in `echo $EXTRACMDS`; do
+  echo "void tcsh_$cmd (Char ** v, struct command * c) { USE(c); tcsh_xxx (v, osh_$cmd); }" >> $SHELLDIR/$PACKAGE-tcsh-wrap.c
+done
+echo "done!"
+
+# Move to the build directory
+cd $SHELLDIR
+
+# Add links to project sources tree
+for f in $FILES; do
+  if [ ! -h $PACKAGE-$f ]; then
+    if [ -f $EXTDIR/$f ]; then
+      ln -sf $EXTDIR/$f $PACKAGE-$f
+    else
+      echo "  Error: source file `basename $SHELLDIR`/$EXTDIR/$f does not exist!"
+      exit 0
+    fi
+  fi
+done
+
+#
+# Patch config/linux for tool chain changes
+#
+echo -n "  patching config/linux .............. "
+if [ ! -f config/linux.ORG ]; then
+  cp config/linux config/linux.ORG
+fi
+
+cp config/linux.ORG config/linux.tmp
+cat config/linux.tmp | sed -e 's|SVID_SOURCE|DEFAULT_SOURCE|g' -e 's|BSD_SOURCE|DEFAULT_SOURCE|g' > config/linux
+rm -f config/linux.tmp
+echo "done!"
+
+#
+# Patch Makefile.in
+#
+#   1. change the name to the executable
+#   2. add search path for project header file to EXTRAFLAGS
+#   3. add more to EXTRALIBS
+#   4. add ${EXTRASRCS} to the macro SHSRCS
+#   5. add ${EXTRAOBJS} to the macro SHOBJS
+#   6. add macro EXTRASRCS= with project source files
+#   7. add macro EXTRAOBJS= with project object files
+#   8.
+#   9. change the main target to use name $PACKAGE
+#
+
+echo -n "  patching Makefile.in ............... "
+if [ ! -f Makefile.in.ORG ]; then
+  cp Makefile.in Makefile.in.ORG
+fi
+
+# 1. change the name to the executable
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e "s|/tcsh|/$PACKAGE|" > Makefile.in
+
+# 2. add search path for project header file to EXTRAFLAGS
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e "s|EXTRAFLAGS =\(.*\)|EXTRAFLAGS =\1 $EXTRAFLAGS|" > Makefile.in
+
+# 3. add more to EXTRALIBS
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e "s|EXTRALIBS =\(.*\)|EXTRALIBS =\1 $EXTRALIBS|" > Makefile.in
+
+# 4. add $EXTRASRCS to the macro SHSRCS
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e 's|SHSRCS=\(.*\)|SHSRCS=\1 ${EXTRASRCS}|' > Makefile.in
+
+# 5. add $EXTRAOBJS to the macro SHOBJS
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e 's|OBJS= ${SHOBJS}\(.*\)|OBJS= ${SHOBJS}\1 ${EXTRAOBJS}|' > Makefile.in
+
+# 6. add macro EXTRASRCS= with project source files
+line=`grep -n "SHSRCS=" Makefile.in | cut -d":" -f 1`
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed "$line i EXTRASRCS= $EXTRASRCS" > Makefile.in
+
+# 7. add macro EXTRAOBJS= with project object files
+line=`grep -n "OBJS=" Makefile.in | tail -1 | cut -d":" -f 1`
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed "$line i EXTRAOBJS= $EXTRAOBJS" > Makefile.in
+
+# 8.
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e "s|tcsh\$(EXEEXT)|$PACKAGE|" > Makefile.in
+
+# 9. change the main target to use name $PACKAGE
+cp Makefile.in Makefile.in.tmp
+cat Makefile.in.tmp | sed -e "s|$PACKAGE:.*|$PACKAGE: \${OBJS} \${LIBES} ${USRLIBS} |" > Makefile.in
+
+rm -f Makefile.in.tmp
+rm -f Makefile
+echo "done!"
+
+#
+# Patch sh.c
+#
+#   o add [$PACKAGE] initialization function
+#
+echo -n "  patching sh.c ...................... "
+if [ ! -f sh.c.ORG ]; then
+  cp sh.c sh.c.ORG
+fi
+
+# Add [$PACKAGE] call to the inizialization function
+cp sh.c.ORG sh.c.tmp
+line=`grep -n 'process(setintr)' sh.c.tmp | cut -d":" -f 1`
+cat sh.c.tmp | sed "$line i {extern void osh_init (char * progname, int quiet); osh_init (progname, fast); }" > sh.c
+rm -f sh.c.tmp
+echo "done!"
+
+#
+# Patch sh.decls.h
+#
+#   o add function declarations
+#
+echo -n "  patching sh.decls.h ................ "
+if [ ! -f sh.decls.h.ORG ]; then
+  cp sh.decls.h sh.decls.h.ORG
+fi
+
+cp sh.decls.h.ORG sh.decls.h
+for cmd in $EXTRACMDS; do
+  cp sh.decls.h sh.decls.h.tmp
+  line=`grep -n '#define' sh.decls.h.tmp | head -1 | cut -d":" -f 1`
+  line=`expr $line + 2`
+  cat sh.decls.h.tmp | sed "$line i extern void tcsh_$cmd (Char **, struct command *);" > sh.decls.h
+done
+
+cp sh.decls.h sh.decls.h.tmp
+line=`grep -n '#define' sh.decls.h.tmp | head -1 | cut -d":" -f 1`
+line=`expr $line + 2`
+cat sh.decls.h.tmp | sed "$line i /* $PACKAGE extension */" > sh.decls.h
+rm -f sh.decls.h.tmp
+echo "done!"
+
+#
+# Patch sh.init.c
+#
+#   o add entries to the table of builtins => const struct biltins bfunc[]
+#
+echo "  patching sh.init.c ................. "
+if [ ! -f sh.init.c.ORG ]; then
+  cp sh.init.c sh.init.c.ORG
+fi
+
+# Add commands to the table of builtins
+maxname=`maxn`
+cp sh.init.c.ORG sh.init.c
+
+# Patch [while] command to add a trailing comma in the event it serves to add commands as last
+cp sh.init.c sh.init.c.tmp
+cat sh.init.c.tmp | sed -e 's|{ "while",		dowhile,	1,	INF	}|{ "while",		dowhile,	1,	INF	},|' > sh.init.c
+
+for cmd in $EXTRACMDS; do
+  cp sh.init.c sh.init.c.tmp
+  line=`linenumber $cmd sh.init.c.tmp`
+
+  if [ "$line" != "" -a "$line" != "0" ]; then
+    cat sh.init.c.tmp | sed "$line i     { \"$cmd\", tcsh_$cmd, 0, INF },		/* $PACKAGE extension */" > sh.init.c
+    echo $maxname $cmd $line | awk '{ printf ("       %-*.*s .................. ok! line [%s]\n", $1, $1, $2, $3) }'
+  else
+    echo $maxname $cmd | awk '{ printf ("       %-*.*s .................. failed! - Please add case in linenumber()\n", $1, $1, $2) }'
+    exit 0
+  fi
+
+  if [ "$line" = "1" ]; then
+    echo "  Error: Wrong specification"
+    exit 0
+  fi
+done
+
+rm -f sh.init.c.tmp
+echo
+
+# Attempt to configure and compile the shell
+cd $SHELLDIR
+
+if [ ! -f config.status ]; then
+  echo -n "  Configuring $PACKAGE ..... "
+ ./configure --prefix=/usr CFLAGS='-g -O2 -D_DEFAULT_SOURCE -Wno-pointer-compare' 1> /dev/null 2>&1
+ echo "done!"
+fi
+
+if [ ! -f sh.err.h ]; then
+  echo -n "  Pre-compiling $PACKAGE ... "
+  make sh.err.h tc.const.h ed.defns.h tc.defs.c 1> /dev/null 2>&1
+  echo "done!"
+fi
