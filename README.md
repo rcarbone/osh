@@ -1,12 +1,12 @@
 # osh
-osh - a shell for Oracle
+osh - a Linux shell for Oracle
 
 # About
 osh is a hack of the Unix shell tcsh mainly implemented to include Oracle client
 functionalities into a shell in order to have support for:
 
   * Multiple Oracle connections
-  * Command line TAB-completion for commands, tables and columns.
+  * Command line TAB-completion for commands, tables and columns
   * History
   * Variables
   * I/O redirections and pipeline
@@ -21,17 +21,15 @@ here is the download button:
 
    2> cd osh
 
-   3> ./configure
+   3> export ORACLE_HOME=`pwd`/3rdparty/oracle/instantclient_12_2
 
-   4> make
+   4> export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}
 
-Hey bash users, please set the following environment variables:
+   5> ./configure
 
-   5> export ORACLE_HOME=`pwd`/3rdparty/oracle/instantclient_12_2
+   6> make
 
-   6> export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}
-
-You can also want to set yout own configuration file [tnsnames.ora].
+You can also want to set your own configuration file [tnsnames.ora].
 Edit the file in etc/ to match your environment and set the environment variable:
 
    7> export TNS_ADMIN=`pwd`/etc/tnsnames.ora

@@ -33,7 +33,7 @@ enum
   OPT_RSSIZE = 'n',
 
   /* Output formats */
-  OPT_MX     = 'm',
+  OPT_TABLE  = 'm',
   OPT_TREE   = 't',
   OPT_CURSES = 'c'
 };
@@ -50,9 +50,9 @@ static struct option lopts [] =
   { "size",   required_argument, NULL, OPT_RSSIZE },
 
   /* Output formats */
-  { "table",  no_argument,       NULL, OPT_MX     },
-  { "curses", no_argument,       NULL, OPT_TREE   },
-  { "tree",   no_argument,       NULL, OPT_CURSES },
+  { "table",  no_argument,       NULL, OPT_TABLE  },
+  { "tree",   no_argument,       NULL, OPT_TREE   },
+  { "curses", no_argument,       NULL, OPT_CURSES },
 
   { NULL,     0,                 NULL, 0          }
 };
@@ -78,14 +78,14 @@ static void usage (char * progname, struct option * options)
   printf ("\n");
 
   /* Output formats */
-  usage_item (options, n, OPT_MX,     "display in a formatted table");
+  usage_item (options, n, OPT_TABLE,  "display in a formatted table");
   usage_item (options, n, OPT_TREE,   "display in a tree");
   usage_item (options, n, OPT_CURSES, "display in a window");
 }
 
 
-/* Query Database and get records in a matrix */
-static void print_mx (unsigned rssize, OCI_Resultset * rs, unsigned n)
+/* Query Database and get records in a table */
+static void print_table (unsigned rssize, OCI_Resultset * rs, unsigned n)
 {
   if (rssize)
     {
@@ -127,7 +127,7 @@ int osh_select (int argc, char * argv [])
   /* Variables that are set according to the specified options */
   bool quiet      = false;
   unsigned wsize  = 0;             /* how many records to display */
-  unsigned fmt    = OPT_MX;
+  unsigned fmt    = OPT_TABLE;
 
   osh_connection_t * conn;
   unsigned i;
@@ -162,7 +162,7 @@ int osh_select (int argc, char * argv [])
 	case OPT_RSSIZE: wsize = atoi (optarg);   break;
 
 	  /* Output formats */
-	case OPT_MX:     fmt = option;            break;
+	case OPT_TABLE:  fmt = option;            break;
 	case OPT_TREE:   fmt = option;            break;
 	case OPT_CURSES: fmt = option;            break;
 	}
@@ -222,7 +222,7 @@ int osh_select (int argc, char * argv [])
     {
       switch (fmt)
 	{
-	case OPT_MX:     print_mx (rssize, rs, wsize);                                               break;
+	case OPT_TABLE:  print_table (rssize, rs, wsize);                                            break;
 	case OPT_TREE:   print_tree (rssize, rs, wsize);                                             break;
 	case OPT_CURSES: print_curses (wsize ? wsize : rssize, rs, wsize, OSH_PACKAGE, OSH_VERSION); break;
 	}

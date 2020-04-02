@@ -1,0 +1,22 @@
+# osh
+osh - a Linux shell for Oracle
+
+# About
+osh is a hack of the Unix shell [tcsh] mainly implemented to include Oracle client
+functionalities into a shell in order to have support for:
+
+  * Multiple Oracle connections
+  * Command line TAB-completion for commands, tables and columns
+  * History
+  * Variables
+  * I/O redirections and pipeline
+
+
+# Configuration
+Edit your own configuration file [tnsnames.ora] file in etc/ to match your environment and set the TNS_ADMIN environment variable:
+
+   setenv TNS_ADMIN /usr/local/osh/etc/tnsnames.ora
+
+# Home Page
+If you are interested in a working in progress documentation please point your browser to:
+  http://tecsiel.it/osh
