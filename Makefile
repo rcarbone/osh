@@ -11,7 +11,7 @@
 PACKAGE  = osh
 
 # Root installation directory
-INSTDIR = /usr/local/${PROJECT}
+INSTDIR = /usr/local/${PACKAGE}
 
 # The list of directories where to make something
 SUBDIRS += src
@@ -133,6 +133,7 @@ LIBS     += 3rdparty/oracle/instantclient_12_2/libipc1.so
 LIBS     += 3rdparty/oracle/instantclient_12_2/libnnz12.so
 LIBS     += 3rdparty/oracle/instantclient_12_2/libons.so
 LIBS     += 3rdparty/oracle/instantclient_12_2/libclntshcore.so.12.1
+LIBS     += 3rdparty/oracle/instantclient_12_2/LICENSE
 install-libs: fs
 	@echo -n "== Installing libraries ... "
 	@make -s SRCFILES="${LIBS}" DSTDIR=${LIBDIR} MODE=644 copy
@@ -150,8 +151,7 @@ DOCS   += docs/README
 DOCS   += docs/AUTHORS
 DOCS   += docs/LICENSE
 DOCS   += docs/VERSION
-DOCS   += docs/Changelog
-
+DOCS   += docs/ChangeLog
 install-docs: fs
 	@echo -n "== Installing docs ........ "
 	@make -s SRCFILES="${DOCS}" DSTDIR=${DOCSDIR} MODE=644 copy
@@ -163,3 +163,6 @@ install-files: fs
 	@echo -n "== Installing files ....... "
 	@make -s SRCFILES="${FILES}" DSTDIR=${ETCDIR} MODE=644 copy
 	@echo "done! =="
+
+# Fake targets
+.PHONY: help fs tree copy install install-libs install-bins install-docs install-files
