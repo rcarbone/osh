@@ -1,3 +1,7 @@
+# What is osh?
+**osh** is a Linux shell for Oracle, implemented as a clone of the **tcsh** shell with extensions to add SQL commands. **osh** may be used as both an interactive tool for interacting with Oracle Database servers and an interpreter for the execution of testsuites.
+
+
 # Docker container for the impatients
 
 If you are impatient and not interested in the full story, here is the download button for a docker image with **osh** in an interactive container based on GNU/Debian bullseye-slim (to be minimalist!):
@@ -49,10 +53,6 @@ It can be easily pulled and run using the following commands:
      OCI v. 12.2     - Oracle Instant Client and Call Interface - Copyright (c) 1995, 2019 Oracle
 ```
 
-# What is osh?
-**osh** is a Linux shell for Oracle, implemented as a clone of the **tcsh** shell with extensions to add SQL commands. **osh** may be used as both an interactive tool for interacting with Oaracle Database servers and an interpreter for the execution of testsuites.
-
-
 # About
 osh is a hack of the **tcsh** shell mainly implemented to include Oracle client functionalities into a shell in order to have support for:
 
@@ -64,7 +64,7 @@ osh is a hack of the **tcsh** shell mainly implemented to include Oracle client 
 
 # Do it by yourself
 
-If you are impatient and not interested in the full story, here is the download button:
+If you prefer to compile by yourself here are the basic steps to do:
 
 ```
    1> git clone https://github.com/rcarbone/osh
@@ -73,20 +73,21 @@ If you are impatient and not interested in the full story, here is the download 
    4> export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}
    5> ./configure
    6> make
+   7> cd shell
+   8> ./osh
 ```
 
-You can also want to set your own configuration file [tnsnames.ora].
-Edit the file in etc/ to match your environment and set the environment variable:
+If you also want to set your own configuration file to match your environment, please edit the file in etc/tnsnames.ora and set the environment variable:
 
 ```
-   7> export TNS_ADMIN=`pwd`/etc/tnsnames.ora
-   8> cd shell
-   9> ./osh
+   9> export TNS_ADMIN=`pwd`/etc/tnsnames.ora
 ```
+
 
 # Home Page
 If you are interested in a working in progress documentation please point your browser to:
   http://tecsiel.it/osh
+
 
 # License
 **osh** is distributed under the BSD License, meaning that you are free to redistribute, modify, or sell the software with almost no restrictions.
