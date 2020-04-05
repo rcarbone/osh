@@ -7,7 +7,7 @@ ENV USER    osh
 ENV SHELL   osh
 
 # Install software
-COPY $PROJECT /usr/local/$PROJECT
+COPY $PROJECT /home/$USER
 
 # Install the software
 RUN set -ex &&          \
@@ -28,15 +28,15 @@ RUN set -ex &&          \
 # 4. Add user to sudoers
 # 5. Add and configure dynamic linker run-time bindings
 RUN \
-    add-shell /usr/local/$PROJECT/bin/$SHELL && \
-    useradd --no-create-home --user-group --home-dir /usr/local/$PROJECT --shell /usr/local/$PROJECT/bin/$SHELL --comment 'OSH user' $USER && \
-    chown -R $USER:$USER /usr/local/$PROJECT && \
+    add-shell /home/$USER/bin/$SHELL && \
+    useradd --no-create-home --user-group --home-dir /home/$USER --shell /home/$USER/bin/$SHELL --comment 'OSH user' $USER && \
+    chown -R $USER:$USER /home/$USER && \
     echo "$USER   ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    echo "/usr/local/$PROJECT/lib" >> /etc/ld.so.conf.d/oracle.conf && \
+    echo "/home/$USER/lib" >> /etc/ld.so.conf.d/oracle.conf && \
     ldconfig
 
 USER    $USER
-WORKDIR /usr/local/$PROJECT
+WORKDIR /home/$USER
 
 # Go for fun
-CMD ["/usr/local/osh/bin/osh"]
+CMD ["/home/osh/bin/osh"]
