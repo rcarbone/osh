@@ -117,7 +117,6 @@ int osh_about (int argc, char * argv [])
       printf ("  tcsh v. %d.%d.%d  - C shell with file name completion and command line editing - %s\n", REV, VERS, PATCHLEVEL, "Christos Zoulas <christos@NetBSD.org>");
       printf ("  OCILIB v. %u.%u.%u - C Driver for Oracle - %s\n", OCILIB_MAJOR_VERSION, OCILIB_MINOR_VERSION, OCILIB_MINOR_VERSION, "Vincent Rogier <vince.rogier@ocilib.net>");
       printf ("  OCI v. %u.%u     - Oracle Instant Client and Call Interface - %s\n", OCI_MAJOR_VERSION, OCI_MINOR_VERSION, "Copyright (c) 1995, 2019 Oracle");
-      printf ("  rlibc v. 1.0.3  - C library of useful functions - %s\n", "R. Carbone <rocco@tecsiel.it>");
     }
 
   /* Bye bye! */

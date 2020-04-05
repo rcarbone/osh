@@ -127,20 +127,19 @@ copy:
 install: all install-libs install-bins install-docs install-files
 
 # Install libraries
-LIBS     += 3rdparty/oracle/instantclient_12_2/libclntsh.so.12.1
-LIBS     += 3rdparty/oracle/instantclient_12_2/libmql1.so
-LIBS     += 3rdparty/oracle/instantclient_12_2/libipc1.so
-LIBS     += 3rdparty/oracle/instantclient_12_2/libnnz12.so
-LIBS     += 3rdparty/oracle/instantclient_12_2/libons.so
-LIBS     += 3rdparty/oracle/instantclient_12_2/libclntshcore.so.12.1
-LIBS     += 3rdparty/oracle/instantclient_12_2/LICENSE
+LIBS   += 3rdparty/oracle/instantclient_12_2/libclntsh.so.12.1
+LIBS   += 3rdparty/oracle/instantclient_12_2/libmql1.so
+LIBS   += 3rdparty/oracle/instantclient_12_2/libipc1.so
+LIBS   += 3rdparty/oracle/instantclient_12_2/libnnz12.so
+LIBS   += 3rdparty/oracle/instantclient_12_2/libons.so
+LIBS   += 3rdparty/oracle/instantclient_12_2/libclntshcore.so.12.1
 install-libs: fs
 	@echo -n "== Installing libraries ... "
 	@make -s SRCFILES="${LIBS}" DSTDIR=${LIBDIR} MODE=644 copy
 	@echo "done! =="
 
 # Install binaries
-BINS     += shell/osh
+BINS   += shell/osh
 install-bins: fs
 	@echo -n "== Installing binaries .... "
 	@make -s SRCFILES="${BINS}" DSTDIR=${BINDIR} MODE=755 copy
@@ -152,6 +151,9 @@ DOCS   += docs/AUTHORS
 DOCS   += docs/LICENSE
 DOCS   += docs/VERSION
 DOCS   += docs/ChangeLog
+DOCS   += docs/LICENSE-Oracle
+DOCS   += docs/LICENSE-ocilib
+DOCS   += docs/Copyright-tcsh
 install-docs: fs
 	@echo -n "== Installing docs ........ "
 	@make -s SRCFILES="${DOCS}" DSTDIR=${DOCSDIR} MODE=644 copy
